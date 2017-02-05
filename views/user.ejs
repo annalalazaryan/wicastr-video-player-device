@@ -1,0 +1,12 @@
+<% include header.ejs %>
+<script>
+    var items = JSON.parse('<%-JSON.stringify(user) %>')
+</script>
+<div class="container">
+    <%= user.stream.url %>
+
+    <video id="video"></video>
+</div>
+
+
+<% include footer.ejs %>

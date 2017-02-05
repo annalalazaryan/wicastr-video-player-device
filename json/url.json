@@ -1,0 +1,16 @@
+{
+  "stream":{
+    "url":"http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p,1_ry9w1l0b/format/applehttp/protocol/http/a.m3u8",
+    "isEneblid":"false"
+  },
+  "video":{
+    "0":{
+      "name":"viode1",
+      "url":"https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8"
+    },
+    "1":{
+      "name":"viode1",
+      "url":"http://www.streambox.fr/playlists/test_001/stream.m3u8"
+    }
+  }
+}
