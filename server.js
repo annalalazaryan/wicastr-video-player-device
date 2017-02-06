@@ -16,7 +16,7 @@ stdin.on('end', function () {
         outputJSON = JSON.stringify(parsedData, null, '    ');
     stdout.write(outputJSON);
     stdout.write('\n');
-    fs.writeFile("a.json", outputJSON, function(err) {
+    fs.writeFile("./json/url.json", outputJSON, function(err) {
         if(err) {
             return console.log(err);
         }
