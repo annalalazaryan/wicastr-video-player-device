@@ -9,9 +9,8 @@
     "co-fs": "^1.2.0",
     "co-render": "^1.1.0",
     "co-views": "^2.1.0",
+    "ejs": "^2.5.5",
     "fs-extra": "^2.0.0",
-    "koa-static": "^2.1.0",
-    "promisify-node": "^0.4.0",
     "koa": "^1.2.1",
     "koa-bodyparser": "^2.2.0",
     "koa-boom": "^0.0.4",
@@ -19,7 +18,9 @@
     "koa-json": "^1.1.3",
     "koa-json-schema": "^1.0.0",
     "koa-logger": "^1.3.0",
-    "koa-router": "^5.4.0"
+    "koa-router": "^5.4.0",
+    "koa-static": "^2.1.0",
+    "promisify-node": "^0.4.0"
   },
   "devDependencies": {},
   "scripts": {

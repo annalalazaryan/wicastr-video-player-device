@@ -56,4 +56,4 @@ app.use(function *() {
     // this.redirect('/someotherspot');
 });
 
-app.listen(8000);
+app.listen(8000,"0.0.0.0");

@@ -2,10 +2,16 @@
 <script>
     var items = JSON.parse('<%-JSON.stringify(user) %>')
 </script>
-<div class="container">
-    <%= user.stream.url %>
+<style>
+    .stream{
+        background-color: red;
+        color: #000;
+    }
+</style>
+<div class="containers">
+    <video id="video" width="100%"></video>
+    <div class="col-md-12" id="videoUrl"></div>
 
-    <video id="video"></video>
 </div>
 
 
