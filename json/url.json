@@ -1,16 +1,32 @@
 {
-  "stream":{
-    "url":"http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p,1_ry9w1l0b/format/applehttp/protocol/http/a.m3u8",
-    "isEneblid":"false"
-  },
-  "video":{
-    "0":{
-      "name":"viode1",
-      "url":"https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8"
-    },
-    "1":{
-      "name":"viode1",
-      "url":"http://www.streambox.fr/playlists/test_001/stream.m3u8"
+  "retryCount": 5,
+  "initialDelay": 1,
+  "message": {
+    "command": "update_app",
+    "app_id": 123,
+    "params": {
+      "playlist": [
+        {
+          "id": 1,
+          "url": "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
+          "name": "Video 1"
+        },
+        {
+          "id": 2,
+          "url": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+          "name": "Video 2"
+        },
+        {
+          "id": 3,
+          "url": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+          "name": "asdasd"
+        }
+      ],
+      "stream": {
+        "id": 1,
+        "streamUrl": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+        "isEnabled": false
+      }
     }
   }
 }

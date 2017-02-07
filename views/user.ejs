@@ -1,15 +1,23 @@
 <% include header.ejs %>
 <script>
-    var items = JSON.parse('<%-JSON.stringify(user) %>')
+    var items = JSON.parse('<%- JSON.stringify(user) %>')
 </script>
 <style>
-    .stream{
+    .stream {
         background-color: red;
-        color: #000;
+        color: red;
+    }
+    #videoUrl a {
+        height: 50px;
+        background-color: #2aabd2;
+        padding: 20px;
+        margin-bottom: 40px;
+        font-size:17px;
     }
 </style>
-<div class="containers">
-    <video id="video" width="100%"></video>
+<div class="container">
+    <div class="divteg">
+    </div>
     <div class="col-md-12" id="videoUrl"></div>
 
 </div>
