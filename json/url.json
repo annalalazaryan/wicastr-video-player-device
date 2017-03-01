@@ -7,11 +7,6 @@
     },
     {
       "id": 2,
-      "url": "http://techslides.com/demos/sample-videos/small.mp4",
-      "name": "Video 2"
-    },
-    {
-      "id": 3,
       "url": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
       "name": "asdasd"
     }
