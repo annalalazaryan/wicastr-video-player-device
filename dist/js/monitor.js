@@ -8,7 +8,7 @@ $(document).ready(function () {
             "url": "http://monitor.wicastr.in",
             "monitorDelay": 20000,
             "monitorRemoveDelay": 60000
-        }
+        };
 
         this.requestSysInfo = function() {
             $.get(self.settings.url + '/sysinfo', function (data) {
@@ -28,15 +28,15 @@ $(document).ready(function () {
             if (self.currSysState && connected) {
                 self.removeIframeWithDelay();
             } else {
-
                 self.cancelIframeRemoval();
+                self.displayIframe();
+            }
+        };
 
-                if (!$("#monitor-iframe").length) {
-                    iframe = $('<iframe id="monitor-iframe" frameBorder="0" allowtransparency="true" src="' + self.settings.url + '"></iframe>');
-                    $("#monitor-overlay").html(iframe);
-                }
-
-                $("#monitor-iframe").show();
+        this.displayIframe = function() {
+            if (!$("#monitor-iframe").length) {
+                iframe = $('<iframe id="monitor-iframe" frameBorder="0" allowtransparency="true" src="' + self.settings.url + '"></iframe>');
+                $("#monitor-overlay").html(iframe);
             }
         };
 
@@ -52,13 +52,34 @@ $(document).ready(function () {
 
         this.removeIframeWithDelay = function() {
             self.monitorRemoveTimeout = setTimeout(function(){
-                $("#monitor-iframe").remove();
+                self.removeIframe();
             }, self.settings.monitorRemoveDelay);
+        };
+
+        this.removeIframe = function() {
+            $("#monitor-iframe").remove();
         };
 
         this.cancelIframeRemoval = function() {
             clearTimeout(self.monitorRemoveTimeout);
-        }
+        };
+
+        $(document).keyup(function(e){
+            switch(e.keyCode) {
+                // ESC
+                case 27:
+                    self.removeIframe();
+
+                    break;
+
+                default:
+                    self.cancelIframeRemoval();
+                    self.displayIframe();
+
+                    break;
+            }
+
+        });
     };
 
     var monitorInst = new Monitor();
