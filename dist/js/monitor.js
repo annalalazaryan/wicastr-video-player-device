@@ -80,9 +80,29 @@ $(document).ready(function () {
             }
 
         });
+
+        this.adaptIframeHeight = function() {
+            window.addEventListener("message", receiveMessage, false);
+
+            function receiveMessage(event) {
+                if (!$('#monitor-iframe').length) {
+                    return;
+                }
+                
+                var origin = event.origin || event.originalEvent.origin;
+                if (origin !== self.settings.url) {
+                    return;
+                }
+
+                if (event.data) {
+                    $('#monitor-iframe').css('height', parseInt(event.data));
+                }
+            }
+        }
     };
 
     var monitorInst = new Monitor();
     monitorInst.requestSysInfo();
+    monitorInst.adaptIframeHeight();
 });
 
