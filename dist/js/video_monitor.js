@@ -60,6 +60,8 @@
         };
 
         this.setupPlyrVolume = function() {
+            this.togglePlyrVolume(self.plyr.isMuted());
+            
             this.plyr.on('volumechange', function(e) {
                 if(self.plyr.isMuted()) {
                     self.togglePlyrVolume(true);
