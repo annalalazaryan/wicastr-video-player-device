@@ -106,7 +106,13 @@
 
         this.setupHlsLevels = function() {
             this.hls.on(Hls.Events.LEVEL_LOADED, function (event, data) {
-                $('#video-info .play-hls-level .hls-levels').html(data.level + '/' + self.hlsLevels.length);
+                if (!self.hlsLevels[data.level]) {
+                    return;
+                }
+
+                var levelDetails = self.hlsLevels[data.level];
+                var levelBitrate = Math.round((levelDetails.bitrate / (1024 * 1024)) * 100) / 100;
+                $('#video-info .play-hls-level .hls-levels').html(data.level + ' (' + levelBitrate + ' Mbps) of ' + self.hlsLevels.length);
             });
         };
 
