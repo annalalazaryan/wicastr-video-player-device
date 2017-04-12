@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    var videoMonitor = new VideoMonitor();
+
     var Video = function () {
         var self = this;
         self.liveUrl = "gghgh";
@@ -41,20 +43,17 @@ $(document).ready(function () {
                         maxBufferLength: 15,
                         maxBufferHole: 1,
                         maxSeekHole: 2,
-                        capLevelToPlayerSize: true,
                         startFragPrefetch: false,
                         manifestLoadingTimeOut: 10000,
                         manifestLoadingMaxRetry: 4,
                         manifestLoadingRetryDelay: 500,
-                        enableCEA708Captions: true,
-                        audioTrackLoadError: 1,
-                        levelNb: 10
+                        enableCEA708Captions: true
                     });
                     hls.loadSource(url);
                     hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    hls.on(Hls.Events.MANIFEST_PARSED, function (e, data) {
                         // console.log(video)
-                        var player = plyr.setup(video);
+                        var player = plyr.setup(video, {'controls':[]});
                         player[0].play()
                         player[0].on("ended", function () {
                             player[0].pause()
@@ -63,6 +62,8 @@ $(document).ready(function () {
                             self.onEnd()
                         })
 
+                        videoMonitor.setup(player[0], hls);
+                        videoMonitor.setupHls(hls, data);
                     });
 
                 }

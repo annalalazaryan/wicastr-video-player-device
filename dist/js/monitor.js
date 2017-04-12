@@ -22,24 +22,6 @@ $(document).ready(function () {
             setTimeout(self.requestSysInfo, self.settings.monitorDelay);
         };
 
-        this.setupMonitorIframe = function(sysinfo) {
-            var connected = (sysinfo.inet.status == "success");
-
-            if (self.currSysState && connected) {
-                self.removeIframeWithDelay();
-            } else {
-                self.cancelIframeRemoval();
-                self.displayIframe();
-            }
-        };
-
-        this.displayIframe = function() {
-            if (!$("#monitor-iframe").length) {
-                iframe = $('<iframe id="monitor-iframe" frameBorder="0" allowtransparency="true" src="' + self.settings.url + '"></iframe>');
-                $("#monitor-overlay").html(iframe);
-            }
-        };
-
         this.refreshDigitalSignage = function(data) {
             var connectionRestored = self.currSysState && 
                 self.currSysState.inet.status == "danger" && 
@@ -50,17 +32,38 @@ $(document).ready(function () {
             }
         };
 
-        this.removeIframeWithDelay = function() {
+        this.setupMonitorIframe = function(sysinfo) {
+            var connected = (sysinfo.inet.status == "success");
+
+            if (self.currSysState && connected) {
+                self.hideMonitorWithDelay();
+            } else {
+                self.cancelHideMonitor();
+                self.displayMonitor();
+            }
+        };
+
+        this.displayMonitor = function() {
+            $("#monitor-overlay").show();
+
+            if (!$("#monitor-iframe").length) {
+                iframe = $('<iframe id="monitor-iframe" frameBorder="0" allowtransparency="true" src="' + self.settings.url + '"></iframe>');
+                $("#iframe-cnt").html(iframe);
+            }
+        };
+
+        this.hideMonitorWithDelay = function() {
             self.monitorRemoveTimeout = setTimeout(function(){
-                self.removeIframe();
+                self.hideMonitor();
             }, self.settings.monitorRemoveDelay);
         };
 
-        this.removeIframe = function() {
+        this.hideMonitor = function() {
             $("#monitor-iframe").remove();
+            $("#monitor-overlay").hide();
         };
 
-        this.cancelIframeRemoval = function() {
+        this.cancelHideMonitor = function() {
             clearTimeout(self.monitorRemoveTimeout);
         };
 
@@ -68,13 +71,13 @@ $(document).ready(function () {
             switch(e.keyCode) {
                 // ESC
                 case 27:
-                    self.removeIframe();
+                    self.hideMonitor();
 
                     break;
 
                 default:
-                    self.cancelIframeRemoval();
-                    self.displayIframe();
+                    self.cancelHideMonitor();
+                    self.displayMonitor();
 
                     break;
             }
@@ -96,6 +99,8 @@ $(document).ready(function () {
 
                 if (event.data) {
                     $('#monitor-iframe').css('height', parseInt(event.data));
+                    $('#iframe-cnt').css('height', parseInt(event.data));
+                    $('#video-info').show();
                 }
             }
         }

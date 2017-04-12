@@ -3,3 +3,4 @@
 .gitignore
 dist/video/
 node_modules/
+/.project
