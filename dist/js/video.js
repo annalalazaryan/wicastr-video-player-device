@@ -14,7 +14,7 @@ $(document).ready(function () {
             count: 0,
             num: 0,
             strem: 0
-        }
+        };
 
         this.getElements = function () {
             var obj = [];
@@ -28,16 +28,14 @@ $(document).ready(function () {
                 obj.push({name: vid[i].name, url: vid[i].url})
             }
             return obj;
-        }
+        };
 
         this.hls = function (url) {
             var u = url.indexOf("mp4")
             if(u < 0) {
                 if (Hls.isSupported()) {
-
-
                     var video = self.createVideo()
-                    console.log(url)
+
                     var hls = new Hls({
                         debug: false,
                         maxBufferLength: 15,
@@ -49,21 +47,48 @@ $(document).ready(function () {
                         manifestLoadingRetryDelay: 500,
                         enableCEA708Captions: true
                     });
+
                     hls.loadSource(url);
                     hls.attachMedia(video);
+
                     hls.on(Hls.Events.MANIFEST_PARSED, function (e, data) {
                         // console.log(video)
                         var player = plyr.setup(video, {'controls':[]});
                         player[0].play()
                         player[0].on("ended", function () {
-                            player[0].pause()
-                            self.settings.num += 1
-                            $(".divteg").html(" ")
-                            self.onEnd()
+                            player[0].pause();
+                            self.settings.num += 1;
+                            self.deleteVideo();
+                            hls.destroy();
+                            self.onEnd();
                         })
 
                         videoMonitor.setup(player[0], hls);
                         videoMonitor.setupHls(hls, data);
+                    });
+
+                    hls.on(Hls.Events.ERROR, function (event, data) {
+                        if (data.fatal) {
+                            switch(data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    // try to recover network error
+                                    hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    // cannot recover
+                                    self.deleteVideo();
+                                    hls.destroy();
+
+                                    self.settings.num += 1;
+
+                                    // TODO: maybe better to reload the page
+                                    self.onEnd();
+                                    break;
+                            }
+                        }
                     });
 
                 }
@@ -79,12 +104,12 @@ $(document).ready(function () {
                     self.onEnd()
                 })
             }
-        }
+        };
 
         this.start = function (item) {
             console.log("aaaa")
             self[self.check]()
-        }
+        };
 
         this.onEnd = function () {
             var len = self.settings.videoItemsVideo.length
@@ -93,9 +118,8 @@ $(document).ready(function () {
                 self.settings.num = 0
             }
             this.start();
+        };
 
-
-        }
         this.liveStream = function () {
             self.settings.strem = 1;
             self.hls(self.liveUrl)
@@ -178,28 +202,39 @@ $(document).ready(function () {
             } else {
                 return "3"
             }
-        }
-        this.createVideo = function () {
-            $(".divteg").html(" ")
+        };
 
-            $(".divteg").append("<video id='video' width='100%' controls></video>")
-            var video = document.getElementById('video')
-            return video;
-        }
+        this.createVideo = function () {
+            this.deleteVideo();
+
+            $(".divteg").html("<video id='video' width='100%' controls></video>");
+
+            return document.getElementById('video');
+        };
+
+        this.deleteVideo = function () {
+            $('.divteg').children().filter('video').each(function(){
+                this.pause(); // can't hurt
+                delete this; // @sparkey reports that this did the trick (even though it makes no sense!)
+                $(this).remove(); // this is probably what actually does the trick
+            });
+
+            $('.divteg').empty();
+        };
+
         this.initial = function () {
-            console.log(items)
             this.time();
-            var os = this.checkedOs()
+            var os = this.checkedOs();
             if (os == 1) {
-                self.check = "ios"
+                self.check = "ios";
                 //this.start("ios")
             } else if (os == 2) {
-                self.check = "android"
+                self.check = "android";
                 //this.start("android")
             } else {
-                self.check = "browser"
+                self.check = "browser";
             }
-            this.start()
+            this.start();
         }
     }
 

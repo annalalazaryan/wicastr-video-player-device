@@ -3,6 +3,7 @@ $(document).ready(function () {
         var self = this;
         this.currSysState;
         this.monitorRemoveTimeout;
+        this.forceDisplay = false;
 
         this.settings = {
             "url": "http://monitor.wicastr.in",
@@ -35,10 +36,16 @@ $(document).ready(function () {
         this.setupMonitorIframe = function(sysinfo) {
             var connected = (sysinfo.inet.status == "success");
 
-            if (self.currSysState && connected) {
-                self.hideMonitorWithDelay();
-            } else {
+            if (!self.currSysState) {
                 self.cancelHideMonitor();
+                self.displayMonitor();
+
+                return;
+            }
+
+            if (!connected) {
+                self.cancelHideMonitor();
+                self.forceToDisplay();
                 self.displayMonitor();
             }
         };
@@ -50,12 +57,28 @@ $(document).ready(function () {
                 iframe = $('<iframe id="monitor-iframe" frameBorder="0" allowtransparency="true" src="' + self.settings.url + '"></iframe>');
                 $("#iframe-cnt").html(iframe);
             }
+
+            if (!self.isForcedToDisplay()) {
+                self.hideMonitorWithDelay();
+            }
+        };
+
+        this.isForcedToDisplay = function() {
+            return self.forceDisplay;
+        };
+
+        this.forceToDisplay = function() {
+            self.forceDisplay = true;
         };
 
         this.hideMonitorWithDelay = function() {
             self.monitorRemoveTimeout = setTimeout(function(){
                 self.hideMonitor();
             }, self.settings.monitorRemoveDelay);
+        };
+
+        this.isMonitorVisible = function() {
+            return $("#monitor-overlay").is(":visible");
         };
 
         this.hideMonitor = function() {
@@ -71,12 +94,14 @@ $(document).ready(function () {
             switch(e.keyCode) {
                 // ESC
                 case 27:
+                    self.cancelHideMonitor();
                     self.hideMonitor();
 
                     break;
 
                 default:
                     self.cancelHideMonitor();
+                    self.forceToDisplay();
                     self.displayMonitor();
 
                     break;

@@ -103,6 +103,31 @@
             this.hls.on(Hls.Events.ERROR, function (event, data) {
                 $('#video-info .play-error span').append(data.type + ' ' + data.details);
             });
+
+            this.hls.on(Hls.Events.ERROR, function (event, data) {
+                var msg = '';
+
+                if (data.fatal) {
+                    switch(data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            // try to recover network error
+                            msg = "fatal network error encountered, try to recover";
+                            console.log(msg);
+                            $('#video-info .play-error span').append(msg);
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            msg = "fatal media error encountered, try to recover";
+                            console.log(msg);
+                            $('#video-info .play-error span').append(msg);
+                            break;
+                        default:
+                            msg = data.type + ' ' + data.details;
+                            console.log(msg);
+                            $('#video-info .play-error span').append(msg);
+                            break;
+                    }
+                }
+            });
         };
 
 
