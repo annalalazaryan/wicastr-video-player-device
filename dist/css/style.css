@@ -40,7 +40,7 @@
  }
 
  html,body,.cntnr,.divteg,.plyr,.plyr__video-wrapper,video {height:100%!important; }
-
+ button,.plyr__controls{ display:none!important;opacity:0!important;visibility:none!important; }
 
  #video-info {
      color: white;
