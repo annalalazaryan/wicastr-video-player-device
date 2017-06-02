@@ -15,7 +15,7 @@ $(document).ready(function () {
             $.get(self.settings.url + '/sysinfo', function (data) {
                 self.setupMonitorIframe(data.info);
 
-                self.refreshDigitalSignage(data.info);
+                self.reloadIfConnectionRestored(data.info);
 
                 self.currSysState = data.info;
             });
@@ -23,7 +23,7 @@ $(document).ready(function () {
             setTimeout(self.requestSysInfo, self.settings.monitorDelay);
         };
 
-        this.refreshDigitalSignage = function(data) {
+        this.reloadIfConnectionRestored = function(data) {
             var connectionRestored = self.currSysState && 
                 self.currSysState.inet.status == "danger" && 
                 data.inet.status == "success";

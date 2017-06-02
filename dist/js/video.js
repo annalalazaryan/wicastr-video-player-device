@@ -1,11 +1,14 @@
 $(document).ready(function () {
-    var videoMonitor = new VideoMonitor();
-
-    var Video = function () {
+    var VideoPlayer = function () {
         var self = this;
         self.liveUrl = "gghgh";
         self.playUrl = "";
         this.check = "";
+        this.hlsobj;
+        this.player;
+        this.videoControl;
+        this.video;
+        this.currentUrl;
 
         this.settings = {
             videoItemsVideo: items.playlist,
@@ -16,7 +19,7 @@ $(document).ready(function () {
             strem: 0
         };
 
-        this.getElements = function () {
+        this.loadPlaylist = function () {
             var obj = [];
             if (self.settings.videoStrem.isEnabled) {
                 obj.push({name: "stream", url: self.settings.videoStrem.streamUrl});
@@ -30,137 +33,13 @@ $(document).ready(function () {
             return obj;
         };
 
-        this.hls = function (url) {
-            var u = url.indexOf("mp4")
-            if(u < 0) {
-                if (Hls.isSupported()) {
-                    var video = self.createVideo()
-
-                    var hls = new Hls({
-                        debug: false,
-                        maxBufferLength: 15,
-                        maxBufferHole: 1,
-                        maxSeekHole: 2,
-                        startFragPrefetch: false,
-                        manifestLoadingTimeOut: 10000,
-                        manifestLoadingMaxRetry: 4,
-                        manifestLoadingRetryDelay: 500,
-                        enableCEA708Captions: true
-                    });
-
-                    hls.loadSource(url);
-                    hls.attachMedia(video);
-
-                    hls.on(Hls.Events.MANIFEST_PARSED, function (e, data) {
-                        // console.log(video)
-                        var player = plyr.setup(video, {'controls':[]});
-                        player[0].play()
-                        player[0].on("ended", function () {
-                            player[0].pause();
-                            self.settings.num += 1;
-                            self.deleteVideo();
-                            hls.destroy();
-                            self.onEnd();
-                        })
-
-                        videoMonitor.setup(player[0], hls);
-                        videoMonitor.setupHls(hls, data);
-                    });
-
-                    hls.on(Hls.Events.ERROR, function (event, data) {
-                        if (data.fatal) {
-                            switch(data.type) {
-                                case Hls.ErrorTypes.NETWORK_ERROR:
-                                    // try to recover network error
-                                    hls.startLoad();
-                                    break;
-                                case Hls.ErrorTypes.MEDIA_ERROR:
-                                    hls.recoverMediaError();
-                                    break;
-                                default:
-                                    // cannot recover
-                                    self.deleteVideo();
-                                    hls.destroy();
-
-                                    self.settings.num += 1;
-
-                                    // TODO: maybe better to reload the page
-                                    self.onEnd();
-                                    break;
-                            }
-                        }
-                    });
-
-                }
-            }else{
-                var video = self.createVideo()
-
-                video.src = url;
-                video.play(url)
-                video.addEventListener('ended', function () {
-                    video.pause()
-                    self.settings.num += 1
-                    $(".divteg").html(" ")
-                    self.onEnd()
-                })
-            }
-        };
-
-        this.start = function (item) {
-            console.log("aaaa")
-            self[self.check]()
-        };
-
-        this.onEnd = function () {
-            var len = self.settings.videoItemsVideo.length
-
-            if (len <= self.settings.num) {
-                self.settings.num = 0
-            }
-            this.start();
-        };
-
-        this.liveStream = function () {
-            self.settings.strem = 1;
-            self.hls(self.liveUrl)
-        }
-        this.endStream = function () {
-            self.settings.strem = 0;
-            self.initial()
-        }
-
-        this.android = function () {
-            var videoItems = self.getElements()
-            $("#videoUrl").html(" ")
-            for (var k = 0; k < videoItems.length; k++) {
-                $("#videoUrl").append("<a class='videoitems btn-block btn text-center " + videoItems[k].name + "' rel=" + videoItems[k].url + ">" + videoItems[k].name + "</a>")
-            }
-            self.browser()
-        }
-
-        this.ios = function () {
-            console.log("asxasxasxsx")
-            init.init()
-
-        }
-
-        this.browser = function () {
-            var url = this.settings.videoItemsVideo[this.settings.num].url
-
-            if (Hls.isSupported()) {
-                this.hls(url);
-            } else {
-                console.log("asxasxasx")
-            }
-        }
-
-        this.time = function () {
+        this.requestPlaylistWithDelay = function () {
             setTimeout(function () {
-                self.ajax()
+                self.requestPlaylist()
             }, this.settings.ajaxTime);
-        }
+        };
 
-        this.ajax = function () {
+        this.requestPlaylist = function () {
             $.post("/url", {data: "data"}, function (data) {
                 self.settings.videoItemsVideo = data.playlist
                 self.settings.videoStrem = data.stream
@@ -188,9 +67,93 @@ $(document).ready(function () {
                     }
                 }
                 self.settings.ajaxTime = 3000;
-                self.time()
+                self.requestPlaylistWithDelay()
             })
-        }
+        };
+
+        this.createVideo = function () {
+            $(".divteg").html("<video id='video' width='100%' controls></video>");
+            self.video = $(".divteg video");
+
+            self.player = plyr.setup(video[0]);
+
+            self.video.on("ended", function(){
+                self.playNextVideo();
+            });
+        };
+
+        this.resetVideo = function () {
+            self.video[0].srcObject = null;
+            self.video[0].src ="";
+            self.video[0].load();
+        };
+
+        this.setupVideoControl = function() {
+            this.videoControl = new VideoControl();
+
+            this.videoControl.setup(self.player[0], self.hlsobj);
+        };
+
+        this.setupHls = function() {
+            if (!Hls.isSupported()) {
+                return;
+            }
+
+            self.hlsobj = new Hls({
+                debug: false,
+                maxBufferHole: 1,
+                manifestLoadingTimeOut: 10000,
+                manifestLoadingMaxRetry: 4,
+                manifestLoadingRetryDelay: 500
+            });
+
+            self.hlsobj.on(Hls.Events.MEDIA_ATTACHED, function () {
+                self.hlsobj.loadSource(self.currentUrl);
+            });
+
+            self.hlsobj.on(Hls.Events.MANIFEST_PARSED, function (e, data) {
+                self.videoControl.setHlsLevels(data);
+
+                self.video[0].play();
+            });
+
+            self.hlsobj.on(Hls.Events.ERROR, function (event, data) {
+                console.log("HLS Error");
+                console.log(data);
+
+                if (data.fatal) {
+                    switch(data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+
+                            console.log("Hls.ErrorTypes.NETWORK_ERROR");
+
+                            // try to recover network error
+                            self.hlsobj.startLoad();
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            console.log("Hls.ErrorTypes.MEDIA_ERROR");
+
+                            self.hlsobj.recoverMediaError();
+                            break;
+                        default:
+                            // cannot recover
+
+                            self.playNextVideo();
+
+                            break;
+                    }
+                } else {
+                    if (data.details ===  Hls.ErrorDetails.INTERNAL_EXCEPTION) {
+                        console.log('Internal exception', data);
+
+                        //location.reload();
+
+                        self.destroy();
+                        self.setup();
+                    }
+                }
+            });
+        };
 
         this.checkedOs = function () {
             var isAndroid = /(android)/i.test(navigator.userAgent);
@@ -204,104 +167,188 @@ $(document).ready(function () {
             }
         };
 
-        this.createVideo = function () {
-            this.deleteVideo();
+        this.setup = function () {
+            //this.requestPlaylistWithDelay();
+            
+            this.createVideo();
 
-            $(".divteg").html("<video id='video' width='100%' controls></video>");
+            if (Hls.isSupported()) {
+                this.setupHls();
+            }
 
-            return document.getElementById('video');
-        };
+            this.setupVideoControl();
 
-        this.deleteVideo = function () {
-            $('.divteg').children().filter('video').each(function(){
-                this.pause(); // can't hurt
-                delete this; // @sparkey reports that this did the trick (even though it makes no sense!)
-                $(this).remove(); // this is probably what actually does the trick
-            });
-
-            $('.divteg').empty();
-        };
-
-        this.initial = function () {
-            this.time();
             var os = this.checkedOs();
             if (os == 1) {
                 self.check = "ios";
-                //this.start("ios")
             } else if (os == 2) {
                 self.check = "android";
-                //this.start("android")
             } else {
                 self.check = "browser";
             }
+
             this.start();
-        }
-    }
+        };
+
+        this.start = function (item) {
+            self[self.check]();
+        };
+
+        this.android = function () {
+            var videoItems = self.loadPlaylist()
+            $("#videoUrl").html(" ")
+            for (var k = 0; k < videoItems.length; k++) {
+                $("#videoUrl").append("<a class='videoitems btn-block btn text-center " + videoItems[k].name + "' rel=" + videoItems[k].url + ">" + videoItems[k].name + "</a>")
+            }
+            self.browser()
+        };
+
+        this.ios = function () {
+            init.init()
+        };
+
+        this.browser = function () {
+            var url = "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8";
+
+            this.playVideo(url);
+        };
+
+        this.playVideo = function(url) {
+            var u = url.indexOf("mp4")
+
+            if (u < 0 && Hls.isSupported()) {
+                this.playWithHls(url);
+            } else {
+                this.playWithVideoTag(url);
+            }
+        };
+
+        this.playWithHls = function (url) {
+            self.currentUrl = url;
+
+            self.hlsobj.attachMedia(self.video[0]);
+        };
+
+        this.playWithVideoTag = function(url) {
+            self.video[0].src = url;
+            self.video[0].play(url);
+        };
+
+        this.playNextVideo = function () {
+            this.pauseVideo();
+
+            self.settings.num += 1;
+
+            self.hlsobj.detachMedia();
+
+            self.resetVideo();
+
+            self.onEnd();
+        };
+
+        this.pauseVideo = function() {
+            self.video[0].pause();
+        };
+
+        this.onEnd = function () {
+            var len = self.settings.videoItemsVideo.length
+
+            if (len <= self.settings.num) {
+                self.settings.num = 0;
+            }
+            this.start();
+        };
+
+        this.destroy = function() {
+            this.videoControl.destroy();
+            this.videoControl = null;
+
+            this.pauseVideo();
+
+            self.settings.num = 0;
+
+            self.resetVideo();
+            self.player[0].destroy();
+
+            this.check = "";
+            this.hlsobj = null;
+            this.currentUrl = "";
+            this.player = null;
+            this.video = null;
+
+            self.hlsobj.destroy();
+        };
+
+        this.liveStream = function () {
+            self.settings.strem = 1;
+            self.playVideo(self.liveUrl);
+        };
+
+        this.endStream = function () {
+            self.settings.strem = 0;
+            self.destroy();
+            self.setup();
+        };
+    };
 
     var Ios = function () {
         var self = this;
-        var videoItems = play.getElements()
+        var videoItems = play.loadPlaylist();
         this.num = 0;
 
         this.init = function (url) {
-
             for (var k = 0; k < videoItems.length; k++) {
-                $("#videoUrl").append("<a class='videoitems btn-block  text-center " + videoItems[k].name + "' rel=" + videoItems[k].url + ">" + videoItems[k].name + "</a>")
+                $("#videoUrl").append("<a class='videoitems btn-block  text-center " + videoItems[k].name + "' rel=" + videoItems[k].url + ">" + videoItems[k].name + "</a>");
             }
 
-            self.firstPlay()
+            self.firstPlay();
+        };
 
-        }
         this.firstPlay = function () {
+            play.createVideo();
 
-            var video = play.createVideo();
+            var video = play.video[0];
             video.src = videoItems[self.num].url;
-            video.play()
+            video.play();
             video.addEventListener('ended', function () {
                 self.num += 1;
-                self.end()
+                self.end();
             }, false);
+        };
 
-        }
         this.end = function () {
-            var len = videoItems.length
+            var len = videoItems.length;
 
             if (len <= self.num) {
-                self.num = 0
+                self.num = 0;
             }
             self.firstPlay();
-        }
+        };
+
         this.play = function (url) {
+            play.createVideo();
 
-            var video = play.createVideo();
+            var video = play.video[0];
             video.src = url;
-            video.play()
-            self.click()
+            video.play();
+            self.click();
+        };
+    };
 
+    var play = new VideoPlayer();
+    play.setup();
+
+    var init = new Ios();
+    
+    $("#videoUrl").on("click", "a", function () {
+        var os = play.checkedOs();
+        var rel = $(this).attr("rel");
+
+        if (os == 1) {
+            init.play(rel);
+        } else if (os == 2) {
+            play.hls(rel);
         }
 
-
-    }
-
-    var play = new Video()
-    var init = new Ios()
-    play.initial()
-
-    $("#videoUrl").on("click", "a", function () {
-        var os = play.checkedOs()
-        var rel = $(this).attr("rel")
-
-        if (os == 1)
-            init.play(rel);
-        else if (os == 2)
-            play.hls(rel)
-
-    })
-
-    var v = document.getElementById("aa");
-    var player = plyr.setup(v);
-    player[0].play()
-    player[0].on("ended", function () {
-
-    })
-})
+    });
+});

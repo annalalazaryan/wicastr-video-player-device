@@ -49,8 +49,12 @@
      white-space: nowrap;
  }
 
- #video-info div {
+ #video-info .play-info {
      margin-right: 10px;
+ }
+
+ #video-info .row {
+    margin-bottom: 2px;
  }
 
  #video-info .play-status {

@@ -4,6 +4,7 @@
 </script>
 <div class="cntnr">
     <div class="divteg">
+        <video id='video' width='100%' controls></video>
     </div>
     <div>
         <div id="monitor-overlay">
@@ -11,20 +12,24 @@
             <div id="video-info" class="container-fluid">
                 <div class="row clearfix">
                     <div class="col-md-4 pull-right clearfix">
-                        <div class="play-hls-level pull-right">
-                            <div><span class="label label-primary">hls level</span> <span class="label label-default hls-levels"></span></div>
-                        </div>
-                        <div class="play-error pull-right">
+                        <div class="play-error play-info pull-right">
                             <span class="label label-danger"></span>
                         </div>
-                        <div class="play-volume pull-right">
+                    </div>
+                </div>
+                <div class="row clearfix">
+                    <div class="col-md-4 pull-right clearfix">
+                        <div class="play-hls-level play-info pull-right">
+                            <span class="label label-primary">hls level</span> <span class="label label-default hls-levels"></span>
+                        </div>
+                        <div class="play-volume play-info pull-right">
                             <i class="fa fa-volume-up" aria-hidden="true"></i>
                             <i class="fa fa-volume-off" aria-hidden="true"></i>
                         </div>
-                        <div class="play-time pull-right">
+                        <div class="play-time play-info pull-right">
                             <span class="label label-primary"></span>
                         </div>
-                        <div class="play-status pull-right">
+                        <div class="play-status play-info pull-right">
                             <i class="fa fa-play" aria-hidden="true"></i>
                             <i class="fa fa-pause" aria-hidden="true"></i>
                         </div>

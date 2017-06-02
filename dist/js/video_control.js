@@ -1,8 +1,8 @@
 (function() {
-    VideoMonitor = function(){
+    VideoControl = function(){
         var self = this;
-        self.plyr;
 
+        self.plyr;
         self.hls;
         self.hlsLevels = [];
         self.hlsFirstLevel;
@@ -23,19 +23,19 @@
 
         this.setup = function(plyr, hls) {
             this.plyr = plyr;
+            this.hls = hls;
 
             this.setupPlyrStatus();
             this.setupPlyrVolume();
             this.setupPlyrTime();
-        };
-
-        this.setupHls = function(hls, data) {
-            this.hls = hls;
-            this.hlsLevels = data.levels;
-            this.hlsFirstLevel = data.firstLevel;
 
             this.setupHlsErrorHandler();
             this.setupHlsLevels();
+        };
+
+        this.setHlsLevels = function(data) {
+            this.hlsLevels = data.levels;
+            this.hlsFirstLevel = data.firstLevel;
         };
 
         this.setupPlyrStatus = function() {
@@ -101,30 +101,32 @@
 
         this.setupHlsErrorHandler = function() {
             this.hls.on(Hls.Events.ERROR, function (event, data) {
-                $('#video-info .play-error span').append(data.type + ' ' + data.details);
-            });
-
-            this.hls.on(Hls.Events.ERROR, function (event, data) {
                 var msg = '';
 
                 if (data.fatal) {
                     switch(data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
                             // try to recover network error
-                            msg = "fatal network error encountered, try to recover";
+                            msg = "Network error, trying to recover.";
                             console.log(msg);
-                            $('#video-info .play-error span').append(msg);
+                            $('#video-info .play-error span').html(msg);
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
-                            msg = "fatal media error encountered, try to recover";
+                            msg = "Media error, trying to recover.";
                             console.log(msg);
-                            $('#video-info .play-error span').append(msg);
+                            $('#video-info .play-error span').html(msg);
                             break;
                         default:
-                            msg = data.type + ' ' + data.details;
+                            msg = data.type + ' Error. Will move to the next video.';
                             console.log(msg);
-                            $('#video-info .play-error span').append(msg);
+                            $('#video-info .play-error span').html(msg);
                             break;
+                    }
+                } else {
+                    if (data.details ===  Hls.ErrorDetails.INTERNAL_EXCEPTION) {
+                        msg = 'Internal HLS Error. Will reload the page.';
+                        console.log(msg);
+                        $('#video-info .play-error span').html(msg);
                     }
                 }
             });
@@ -143,5 +145,15 @@
             });
         };
 
+        this.destroy = function() {
+            $('#video-info .play-error span').html("");
+            $('#video-info .play-hls-level .hls-levels').html("");
+            $('#video-info .play-time span').html("");
+
+            this.plyr = null;
+            this.hls = null;
+            this.hlsLevels = [];
+            this.hlsFirstLevel = null;
+        };
     };
 })();
