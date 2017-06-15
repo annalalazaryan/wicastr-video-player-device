@@ -84,6 +84,10 @@
 
         this.setupPlyrTime = function() {
             this.plyr.on('timeupdate', function(e) {
+                if (!self.plyr) {
+                    return;
+                }
+
                 var dt = new Date(null);
                 dt.setSeconds(self.plyr.getCurrentTime());
 
@@ -124,7 +128,7 @@
                     }
                 } else {
                     if (data.details ===  Hls.ErrorDetails.INTERNAL_EXCEPTION) {
-                        msg = 'Internal HLS Error. Will reload the page.';
+                        msg = 'Internal HLS Error. Will re-initialize the player';
                         console.log(msg);
                         $('#video-info .play-error span').html(msg);
                     }

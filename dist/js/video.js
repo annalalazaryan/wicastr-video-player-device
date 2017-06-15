@@ -138,15 +138,14 @@ $(document).ready(function () {
                         default:
                             // cannot recover
 
-                            self.playNextVideo();
+                            self.destroy();
+                            self.setup();
 
                             break;
                     }
                 } else {
                     if (data.details ===  Hls.ErrorDetails.INTERNAL_EXCEPTION) {
                         console.log('Internal exception', data);
-
-                        //location.reload();
 
                         self.destroy();
                         self.setup();
@@ -260,23 +259,22 @@ $(document).ready(function () {
         };
 
         this.destroy = function() {
-            this.videoControl.destroy();
-            this.videoControl = null;
+            this.settings.num = 0;
+            this.check = "";
+            this.currentUrl = "";
 
             this.pauseVideo();
 
-            self.settings.num = 0;
+            this.videoControl.destroy();
+            this.videoControl = null;
 
-            self.resetVideo();
-            self.player[0].destroy();
-
-            this.check = "";
-            this.hlsobj = null;
-            this.currentUrl = "";
+            this.resetVideo();
+            this.player[0].destroy();
             this.player = null;
             this.video = null;
 
-            self.hlsobj.destroy();
+            this.hlsobj.destroy();
+            this.hlsobj = null;
         };
 
         this.liveStream = function () {
