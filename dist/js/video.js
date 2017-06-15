@@ -167,7 +167,7 @@ $(document).ready(function () {
         };
 
         this.setup = function () {
-            //this.requestPlaylistWithDelay();
+            this.requestPlaylistWithDelay();
             
             this.createVideo();
 
@@ -207,7 +207,8 @@ $(document).ready(function () {
         };
 
         this.browser = function () {
-            var url = "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8";
+            // var url = "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8";
+            var url = this.settings.videoItemsVideo[this.settings.num].url;
 
             this.playVideo(url);
         };
