@@ -2,18 +2,23 @@
   "playlist": [
     {
       "id": 1,
-      "url": "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
-      "name": "Video 1"
+      "url": "http://mp4.wicastr.co/RB_MI201510090108_960p.mp4",
+      "name": "RedBull1"
     },
     {
       "id": 2,
-      "url": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
-      "name": "asdasd"
+      "url": "http://mp4.wicastr.co/RB_MI201601180062_960p.mp4",
+      "name": "RedBull2"
+    },
+    {
+      "id": 3,
+      "url": "http://mp4.wicastr.co/RB_MI201601200470_960p.mp4",
+      "name": "RedBull3"
     }
   ],
   "stream": {
     "id": 1,
-    "streamUrl": "https://rbtvdiglinear-i.akamaihd.net/hls/live/257883/BORB13AT1/master_fb1660.m3u8",
+    "streamUrl": "http://content.jwplatform.com/manifests/vM7nH0Kl.m3u8",
     "isEnabled": true
   }
 }
