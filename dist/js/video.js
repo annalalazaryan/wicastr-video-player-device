@@ -335,9 +335,9 @@ $(document).ready(function () {
     };
 
     var play = new VideoPlayer();
+    var init = new Ios();    
+    
     play.setup();
-
-    var init = new Ios();
     
     $("#videoUrl").on("click", "a", function () {
         var os = play.checkedOs();
