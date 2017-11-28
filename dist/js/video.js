@@ -172,10 +172,11 @@ $(document).ready(function () {
             this.createVideo();
 
             if (Hls.isSupported()) {
-                this.setupHls();
-                this.setupVideoControl();    
+                this.setupHls();   
             }
-
+            
+            // this.setupVideoControl();    
+            
             var os = this.checkedOs();
             if (os == 1) {
                 self.check = "ios";
