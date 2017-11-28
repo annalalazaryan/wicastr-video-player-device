@@ -173,9 +173,8 @@ $(document).ready(function () {
 
             if (Hls.isSupported()) {
                 this.setupHls();
+                this.setupVideoControl();    
             }
-
-            this.setupVideoControl();
 
             var os = this.checkedOs();
             if (os == 1) {
