@@ -23,14 +23,16 @@
 
         this.setup = function(plyr, hls) {
             this.plyr = plyr;
-            this.hls = hls;
 
             this.setupPlyrStatus();
             this.setupPlyrVolume();
             this.setupPlyrTime();
 
-            this.setupHlsErrorHandler();
-            this.setupHlsLevels();
+            if(hls) {
+                this.hls = hls;
+                this.setupHlsErrorHandler();
+                this.setupHlsLevels(); 
+            }
         };
 
         this.setHlsLevels = function(data) {
