@@ -173,6 +173,7 @@ $(document).ready(function () {
 
             if (Hls.isSupported()) {
                 this.setupHls();   
+                this.setupVideoControl();    
             }
             
             // this.setupVideoControl();    
