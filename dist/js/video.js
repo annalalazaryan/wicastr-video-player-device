@@ -56,14 +56,23 @@ $(document).ready(function () {
                         }
                     }
                 } else {
-                    if (data.stream.isEnabled ) {
+                    if (data.stream.isEnabled && self.playUrl !== data.stream.streamUrl ) {
                         console.log(self.liveUrl)
                         self.playUrl = data.stream.streamUrl
 
                         $("#videoUrl .stream").remove();
-                        $("#videoUrl .videoitems").eq(0).before("<a class='videoitems btn-block text-center stream' rel=" + self.playUrl + ">stream</a>")
+                        $("#videoUrl .videoitems").eq(0).before("<a class='videoitems btn-block text-center stream' rel=" + self.playUrl + ">stream</a>")  
+                        self.settings.strem = 1;
+                        $("#videoUrl .stream").click()
+                        self.video[0].play()
                     } else if (!data.stream.isEnabled) {
-                        $("#videoUrl").children("a.stream").remove()
+                       if(self.settings.strem == 1) {
+                            self.playUrl = ''
+                            $("#videoUrl").children("a.stream").remove()
+                            $("#videoUrl .videoitems").eq(1).click()
+                            self.endStream()
+                            self.video[0].play()
+                       }
                     }
                 }
                 self.settings.ajaxTime = 3000;
@@ -330,7 +339,7 @@ $(document).ready(function () {
             var video = play.video[0];
             video.src = url;
             video.play();
-            self.click();
+            //self.click();
         };
     };
 
@@ -346,7 +355,7 @@ $(document).ready(function () {
         if (os == 1) {
             init.play(rel);
         } else if (os == 2) {
-            play.hls(rel);
+            play.playWithHls(rel);
         }
 
     });
