@@ -11,7 +11,6 @@ const serve = require('koa-static');
 const bodyParser = require('koa-bodyparser');
 
 const args = process.argv;
-let port = 8000;
 
 app.use(logger());
 app.use(bodyParser());
@@ -58,4 +57,7 @@ args.forEach((x, y)=>{
     }
 });
 
-app.listen(port, "127.0.0.1");
+const port = process.env.NODE_PORT || 8000
+app.listen(port)
+
+console.log('Server start ' + port)
